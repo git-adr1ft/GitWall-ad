@@ -291,6 +291,7 @@ export function drawSquidGameCell(
 }
 
 let cachedBgImg: Image | null = null;
+let cachedDalgonaBgImg: Image | null = null;
 
 export function drawSquidGameSceneBackground(
   ctx: CanvasRenderingContext2D,
@@ -299,31 +300,52 @@ export function drawSquidGameSceneBackground(
   scale: number,
   variant: SquidGameVariant
 ) {
-  if (variant !== "masks") {
-    // Only the Guard Masks variant gets the custom image background wallpaper
+  if (variant !== "masks" && variant !== "dalgona") {
+    // Only the Guard Masks and Dalgona Candy variants get custom image backgrounds
     return;
   }
 
   try {
-    if (!cachedBgImg) {
-      const imgPath = path.join(process.cwd(), "src", "assets", "squidgame_bg.png");
-      if (fs.existsSync(imgPath)) {
-        const img = new Image();
-        img.src = fs.readFileSync(imgPath);
-        cachedBgImg = img;
+    if (variant === "masks") {
+      if (!cachedBgImg) {
+        const imgPath = path.join(process.cwd(), "src", "assets", "squidgame_bg.png");
+        if (fs.existsSync(imgPath)) {
+          const img = new Image();
+          img.src = fs.readFileSync(imgPath);
+          cachedBgImg = img;
+        }
+      }
+
+      if (cachedBgImg) {
+        // Cover-fit rendering to scale and center the background image on any device dimension
+        const scaleImg = Math.max(width / cachedBgImg.width, height / cachedBgImg.height);
+        const dw = cachedBgImg.width * scaleImg;
+        const dh = cachedBgImg.height * scaleImg;
+        const dx = (width - dw) / 2;
+        const dy = (height - dh) / 2;
+        ctx.drawImage(cachedBgImg, dx, dy, dw, dh);
+      }
+    } else if (variant === "dalgona") {
+      if (!cachedDalgonaBgImg) {
+        const imgPath = path.join(process.cwd(), "src", "assets", "dalgona_bg.png");
+        if (fs.existsSync(imgPath)) {
+          const img = new Image();
+          img.src = fs.readFileSync(imgPath);
+          cachedDalgonaBgImg = img;
+        }
+      }
+
+      if (cachedDalgonaBgImg) {
+        // Cover-fit rendering to scale and center the background image on any device dimension
+        const scaleImg = Math.max(width / cachedDalgonaBgImg.width, height / cachedDalgonaBgImg.height);
+        const dw = cachedDalgonaBgImg.width * scaleImg;
+        const dh = cachedDalgonaBgImg.height * scaleImg;
+        const dx = (width - dw) / 2;
+        const dy = (height - dh) / 2;
+        ctx.drawImage(cachedDalgonaBgImg, dx, dy, dw, dh);
       }
     }
-
-    if (cachedBgImg) {
-      // Cover-fit rendering to scale and center the background image on any device dimension
-      const scaleImg = Math.max(width / cachedBgImg.width, height / cachedBgImg.height);
-      const dw = cachedBgImg.width * scaleImg;
-      const dh = cachedBgImg.height * scaleImg;
-      const dx = (width - dw) / 2;
-      const dy = (height - dh) / 2;
-      ctx.drawImage(cachedBgImg, dx, dy, dw, dh);
-    }
   } catch (err) {
-    console.error("Failed to load or draw Squid Game background image:", err);
+    console.error(`Failed to load or draw Squid Game (${variant}) background image:`, err);
   }
 }
