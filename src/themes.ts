@@ -2,6 +2,7 @@ import type { MinecraftVariant } from "./lib/minecraft";
 import type { OnePieceVariant } from "./lib/onepiece";
 import type { AttackOnTitanVariant } from "./lib/attackontitan";
 import type { GameOfThronesVariant } from "./lib/gameofthrones";
+import type { SquidGameVariant } from "./lib/squidgame";
 
 export interface Theme {
   name: string;
@@ -13,8 +14,8 @@ export interface Theme {
   // When set, cells are drawn as pixel-art icons instead of plain boxes/circles,
   // or (attackontitan/gameofthrones) the whole calendar is rendered as one scene.
   // `empty`/`levels` only feed the theme-picker swatch in these modes.
-  style?: "minecraft" | "onepiece" | "attackontitan" | "gameofthrones";
-  variant?: MinecraftVariant | OnePieceVariant | AttackOnTitanVariant | GameOfThronesVariant;
+  style?: "minecraft" | "onepiece" | "attackontitan" | "gameofthrones" | "squidgame";
+  variant?: MinecraftVariant | OnePieceVariant | AttackOnTitanVariant | GameOfThronesVariant | SquidGameVariant;
 }
 
 export const THEMES: Record<string, Theme> = {
@@ -255,6 +256,38 @@ export const THEMES: Record<string, Theme> = {
     levels: ["#1a4e96", "#5cb4ff", "#c4ecff", "#ffffff"],
     text: "#eaf4ff",
     subtext: "#88a4c0",
+  },
+
+  // ── Squid Game styles ─────────────────────────────────────────────────────
+  "squidgame-masks": {
+    name: "Guard Masks",
+    style: "squidgame",
+    variant: "masks",
+    background: "#0c0d12",
+    empty: "#1b181e",
+    levels: ["#5a122e", "#9e174b", "#da1b60", "#ff4081"],
+    text: "#ffffff",
+    subtext: "#da1b60",
+  },
+  "squidgame-dalgona": {
+    name: "Dalgona Candy",
+    style: "squidgame",
+    variant: "dalgona",
+    background: "#18110b",
+    empty: "#2c2117",
+    levels: ["#e4a867", "#d39450", "#c17f3a", "#a46726"],
+    text: "#ffe0b2",
+    subtext: "#b47d30",
+  },
+  "squidgame-tracksuit": {
+    name: "Player Tracksuit",
+    style: "squidgame",
+    variant: "tracksuit",
+    background: "#080d0c",
+    empty: "#142220",
+    levels: ["#134e4a", "#0d766e", "#0f766e", "#14b8a6"],
+    text: "#e0f2f1",
+    subtext: "#027c7a",
   },
 };
 

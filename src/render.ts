@@ -10,6 +10,7 @@ import type { AttackOnTitanVariant } from "./lib/attackontitan";
 import { renderAotScene } from "./lib/aotScene";
 import { renderGotScene } from "./lib/gotScene";
 import { GAMEOFTHRONES_WORDS, type GameOfThronesVariant } from "./lib/gameofthrones";
+import { drawSquidGameCell, type SquidGameVariant } from "./lib/squidgame";
 import type { ContributionCalendar } from "./github";
 
 const fontsDir = path.join(process.cwd(), "fonts");
@@ -135,6 +136,7 @@ export function renderWallpaper(
   } else {
     const isMinecraft = theme.style === "minecraft";
     const isOnePiece = theme.style === "onepiece";
+    const isSquidGame = theme.style === "squidgame";
     const isPixelArt = isMinecraft || isOnePiece;
     if (isPixelArt) ctx.antialias = "none";
     for (let i = 0; i < recentDays.length; i++) {
@@ -148,6 +150,8 @@ export function renderWallpaper(
         drawMinecraftCell(ctx, x, y, cellSize, level, theme.variant as import("./lib/minecraft").MinecraftVariant, seed);
       } else if (isOnePiece) {
         drawOnePieceCell(ctx, x, y, cellSize, level, theme.variant as OnePieceVariant, seed);
+      } else if (isSquidGame) {
+        drawSquidGameCell(ctx, x, y, cellSize, level, theme.variant as SquidGameVariant, seed);
       } else {
         ctx.fillStyle = level === -1 ? theme.empty : theme.levels[level];
         drawCell(ctx, x, y, cellSize, cornerRadius, shape);
