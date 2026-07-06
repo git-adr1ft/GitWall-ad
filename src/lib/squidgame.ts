@@ -1,4 +1,6 @@
-import type { CanvasRenderingContext2D } from "canvas";
+import { Image, type CanvasRenderingContext2D } from "canvas";
+import fs from "fs";
+import path from "path";
 
 export type SquidGameVariant = "masks" | "dalgona" | "tracksuit";
 
@@ -285,5 +287,43 @@ export function drawSquidGameCell(
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(playerNumbers[level], cx, cy);
+  }
+}
+
+let cachedBgImg: Image | null = null;
+
+export function drawSquidGameSceneBackground(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  scale: number,
+  variant: SquidGameVariant
+) {
+  if (variant !== "masks") {
+    // Only the Guard Masks variant gets the custom image background wallpaper
+    return;
+  }
+
+  try {
+    if (!cachedBgImg) {
+      const imgPath = path.join(process.cwd(), "src", "assets", "squidgame_bg.png");
+      if (fs.existsSync(imgPath)) {
+        const img = new Image();
+        img.src = fs.readFileSync(imgPath);
+        cachedBgImg = img;
+      }
+    }
+
+    if (cachedBgImg) {
+      // Cover-fit rendering to scale and center the background image on any device dimension
+      const scaleImg = Math.max(width / cachedBgImg.width, height / cachedBgImg.height);
+      const dw = cachedBgImg.width * scaleImg;
+      const dh = cachedBgImg.height * scaleImg;
+      const dx = (width - dw) / 2;
+      const dy = (height - dh) / 2;
+      ctx.drawImage(cachedBgImg, dx, dy, dw, dh);
+    }
+  } catch (err) {
+    console.error("Failed to load or draw Squid Game background image:", err);
   }
 }

@@ -10,7 +10,7 @@ import type { AttackOnTitanVariant } from "./lib/attackontitan";
 import { renderAotScene } from "./lib/aotScene";
 import { renderGotScene } from "./lib/gotScene";
 import { GAMEOFTHRONES_WORDS, type GameOfThronesVariant } from "./lib/gameofthrones";
-import { drawSquidGameCell, type SquidGameVariant } from "./lib/squidgame";
+import { drawSquidGameCell, drawSquidGameSceneBackground, type SquidGameVariant } from "./lib/squidgame";
 import type { ContributionCalendar } from "./github";
 
 const fontsDir = path.join(process.cwd(), "fonts");
@@ -69,8 +69,14 @@ export function renderWallpaper(
   ctx.patternQuality = "best";
   ctx.quality = "best";
 
+  const scale = width / 393;
+
   ctx.fillStyle = theme.background;
   ctx.fillRect(0, 0, width, height);
+
+  if (theme.style === "squidgame") {
+    drawSquidGameSceneBackground(ctx, width, height, scale, theme.variant as SquidGameVariant);
+  }
 
   const weeks = calendar.weeks;
   const totalContributions = calendar.totalContributions;
@@ -85,7 +91,6 @@ export function renderWallpaper(
 
   // Scale relative to 393×852 reference (iPhone 16 logical dimensions)
   // This matches the SVG mockup exactly: 24px cells, 5px gap, 40px margins
-  const scale = width / 393;
   const cellSize = Math.round(24 * scale);
   const cellGap = Math.round(5 * scale);
   const cellStep = cellSize + cellGap;
