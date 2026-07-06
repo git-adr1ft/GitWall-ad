@@ -2,6 +2,9 @@ const cache = new Map<string, { data: Buffer; time: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
 
 export function getCached(key: string): Buffer | null {
+  if (process.env.NODE_ENV === "development") {
+    return null;
+  }
   const entry = cache.get(key);
   if (entry && Date.now() - entry.time < CACHE_TTL) {
     return entry.data;

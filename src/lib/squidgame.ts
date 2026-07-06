@@ -292,6 +292,7 @@ export function drawSquidGameCell(
 
 let cachedBgImg: Image | null = null;
 let cachedDalgonaBgImg: Image | null = null;
+let cachedTracksuitBgImg: Image | null = null;
 
 export function drawSquidGameSceneBackground(
   ctx: CanvasRenderingContext2D,
@@ -300,8 +301,8 @@ export function drawSquidGameSceneBackground(
   scale: number,
   variant: SquidGameVariant
 ) {
-  if (variant !== "masks" && variant !== "dalgona") {
-    // Only the Guard Masks and Dalgona Candy variants get custom image backgrounds
+  if (variant !== "masks" && variant !== "dalgona" && variant !== "tracksuit") {
+    // Only masks, dalgona, and tracksuit variants get custom image backgrounds
     return;
   }
 
@@ -343,6 +344,81 @@ export function drawSquidGameSceneBackground(
         const dx = (width - dw) / 2;
         const dy = (height - dh) / 2;
         ctx.drawImage(cachedDalgonaBgImg, dx, dy, dw, dh);
+      }
+    } else if (variant === "tracksuit") {
+      if (!cachedTracksuitBgImg) {
+        const imgPath = path.join(process.cwd(), "src", "assets", "tracksuit_bg.png");
+        if (fs.existsSync(imgPath)) {
+          const img = new Image();
+          img.src = fs.readFileSync(imgPath);
+          cachedTracksuitBgImg = img;
+        }
+      }
+
+      if (cachedTracksuitBgImg) {
+        // Draw the background image with cover-fit scaling to show the entire artwork (side stairs, watchtowers, etc.)
+        const scaleImg = Math.max(width / cachedTracksuitBgImg.width, height / cachedTracksuitBgImg.height);
+        const dw = cachedTracksuitBgImg.width * scaleImg;
+        const dh = cachedTracksuitBgImg.height * scaleImg;
+        const dx = (width - dw) / 2;
+        const dy = (height - dh) / 2;
+        ctx.drawImage(cachedTracksuitBgImg, dx, dy, dw, dh);
+
+        // Draw the glowing neon shapes (Circle, Triangle, Square) dynamically
+        // centered horizontally just above the grid activity wall starts
+        const gridTop = Math.round(height * 0.36);
+        const targetY = gridTop - 56 * scale;
+        const shapeSize = 25 * scale;
+        const spacing = 72 * scale;
+        const color = "#00e5ff"; // neon cyan
+
+        const drawPath = (type: "circle" | "triangle" | "square", cx: number, cy: number, size: number) => {
+          ctx.beginPath();
+          if (type === "circle") {
+            ctx.arc(cx, cy, size * 0.75, 0, Math.PI * 2);
+          } else if (type === "triangle") {
+            const h = size * 1.5;
+            ctx.moveTo(cx, cy - h / 2);
+            ctx.lineTo(cx - size * 0.866, cy + h / 4);
+            ctx.lineTo(cx + size * 0.866, cy + h / 4);
+            ctx.closePath();
+          } else if (type === "square") {
+            const half = size * 0.7;
+            ctx.rect(cx - half, cy - half, half * 2, half * 2);
+          }
+          ctx.stroke();
+        };
+
+        const drawNeon = (type: "circle" | "triangle" | "square", cx: number, cy: number) => {
+          ctx.strokeStyle = color;
+          ctx.lineJoin = "round";
+          ctx.lineCap = "round";
+
+          // Layered glow - thickened for the much larger shapes
+          ctx.lineWidth = 15 * scale;
+          ctx.globalAlpha = 0.15;
+          drawPath(type, cx, cy, shapeSize);
+
+          ctx.lineWidth = 9 * scale;
+          ctx.globalAlpha = 0.35;
+          drawPath(type, cx, cy, shapeSize);
+
+          ctx.lineWidth = 5 * scale;
+          ctx.globalAlpha = 0.65;
+          drawPath(type, cx, cy, shapeSize);
+
+          // Crisp core
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2.4 * scale;
+          ctx.globalAlpha = 1.0;
+          drawPath(type, cx, cy, shapeSize);
+        };
+
+        ctx.save();
+        drawNeon("circle", width / 2 - spacing, targetY);
+        drawNeon("triangle", width / 2, targetY);
+        drawNeon("square", width / 2 + spacing, targetY);
+        ctx.restore();
       }
     }
   } catch (err) {
